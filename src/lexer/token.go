@@ -19,8 +19,11 @@ const (
 	DELETE
 	CREATE
 	ALTER
-	DROP
+
+	DATABASE
 	TABLE
+	DROP
+
 	COLUMN
 	Value
 
@@ -84,6 +87,8 @@ func TokenKindString(kind TokenKind) string {
 		return "DROP"
 	case TABLE:
 		return "TABLE"
+	case DATABASE:
+		return "DATABASE"
 	case COLUMN:
 		return "COLUMN"
 	case Value:

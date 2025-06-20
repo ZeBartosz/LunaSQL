@@ -141,6 +141,8 @@ func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 		kind = DROP
 	case "TABLE":
 		kind = TABLE
+	case "DATABASE":
+		kind = DATABASE
 	case "COLUMN":
 		kind = COLUMN
 	}
