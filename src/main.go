@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ZeBartosz/miniSQL/src/lexer"
+	"github.com/ZeBartosz/LunaSQL/src/lexer"
 )
 
 func main() {
