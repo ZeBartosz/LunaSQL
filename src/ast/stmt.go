@@ -12,8 +12,8 @@ type ExprStmt struct {
 
 func (n ExprStmt) stmt() {}
 
-type CreateStmt struct {
+type CreateDatabaseStmt struct {
 	TableName string
 }
 
-func (n CreateStmt) stmt() {}
+func (n CreateDatabaseStmt) stmt() {}

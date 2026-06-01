@@ -36,7 +36,7 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 
 	p.expect(lexer.SEMICOLON)
 
-	return ast.CreateStmt{
+	return ast.CreateDatabaseStmt{
 		TableName: databaseName.Value,
 	}, nil
 }

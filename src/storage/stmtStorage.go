@@ -8,12 +8,12 @@ import (
 //		gen.writeln(generateExpression(stmt.Expression) + ";\n")
 //	}
 
-func generateBlockStmt(block ast.BlockStmt, eng *Engine) {
+func generateBlockStmt(block ast.BlockStmt, exec Executor) {
 	for _, stmt := range block.Body {
-		generateStatement(stmt, eng)
+		generateStatement(stmt, exec)
 	}
 }
 
-func generateCreateStmt(createStmt ast.CreateStmt, eng *Engine) (*Database, error) {
+func generateCreateStmt(createStmt ast.CreateDatabaseStmt, eng *Engine) (*Database, error) {
 	return eng.CreateDatabase(createStmt.TableName)
 }

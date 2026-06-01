@@ -18,27 +18,33 @@ type Engine struct {
 	Root string
 }
 
+type Executor struct {
+	engine   *Engine
+	database *Database
+}
+
 func Storage(n ast.Stmt) {
+	var executor Executor
 	engine, err := NewEngine("./database")
 	if err != nil {
 		panic(err)
 	}
 
-	generateStatement(n, engine)
+	executor.engine = engine
+	generateStatement(n, executor)
 }
 
-func generateStatement(stmt ast.Stmt, eng *Engine) {
-	var _ *Database
+func generateStatement(stmt ast.Stmt, exec Executor) {
 	switch n := stmt.(type) {
 	case ast.BlockStmt:
-		generateBlockStmt(n, eng)
-	case ast.CreateStmt:
-		db, err := generateCreateStmt(n, eng)
+		generateBlockStmt(n, exec)
+	case ast.CreateDatabaseStmt:
+		db, err := generateCreateStmt(n, exec.engine)
 		if err != nil {
 			panic(err)
 		}
 
-		_ = db
+		exec.database = db
 	default:
 		fmt.Printf("// Unsupported statement type: %T\n", stmt)
 	}
