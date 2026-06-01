@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/ZeBartosz/LunaSQL/src/lexer"
+	"github.com/ZeBartosz/LunaSQL/src/parser"
+	"github.com/sanity-io/litter"
 )
 
 func main() {
@@ -17,9 +19,18 @@ func main() {
 
 	tokens := lexer.Tokenize(string(bytes))
 
+	fmt.Println("\n--- Tokens ---")
 	for _, i := range tokens {
 		i.Debug()
 	}
 
-	fmt.Println("File read successfully, no errors found.")
+	ast, err := parser.Parse(tokens)
+	if err != nil {
+		fmt.Printf("Error parsing ast %v\n", err)
+	}
+
+	fmt.Println("\n--- Abstract Syntax Tree ---")
+	litter.Dump(ast)
+
+	fmt.Println("\nFile read successfully, no errors found.")
 }

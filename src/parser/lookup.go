@@ -65,43 +65,44 @@ func stmt(kind lexer.TokenKind, stmt_fn stmt_handler) {
 }
 
 func createTokenLookups() {
-	led(lexer.ASSIGNMENT, assignment, parse_assignment_expr)
-	led(lexer.PLUS_EQUALS, assignment, parse_assignment_expr)
-	led(lexer.MINUS_EQUALS, assignment, parse_assignment_expr)
+	// led(lexer.ASSIGNMENT, assignment, parse_assignment_expr)
+	// led(lexer.PLUS_EQUALS, assignment, parse_assignment_expr)
+	// led(lexer.MINUS_EQUALS, assignment, parse_assignment_expr)
 	// TODO: *= /= %=
 
 	// Logical
-	led(lexer.AND, logical, parse_binary_expr)
-	led(lexer.OR, logical, parse_binary_expr)
-	led(lexer.DOT_DOT, logical, parse_binary_expr)
+	// led(lexer.AND, logical, parse_binary_expr)
+	// led(lexer.OR, logical, parse_binary_expr)
+	// led(lexer.DOT_DOT, logical, parse_binary_expr)
 
 	// Relational
-	led(lexer.LESS, relational, parse_binary_expr)
-	led(lexer.LESS_EQUALS, relational, parse_binary_expr)
-	led(lexer.GREATER, relational, parse_binary_expr)
-	led(lexer.GREATER_EQUALS, relational, parse_binary_expr)
-	led(lexer.EQUALS, relational, parse_binary_expr)
-	led(lexer.NOT_EQUALS, relational, parse_binary_expr)
+	// led(lexer.LESS, relational, parse_binary_expr)
+	// led(lexer.LESS_EQUALS, relational, parse_binary_expr)
+	// led(lexer.GREATER, relational, parse_binary_expr)
+	// led(lexer.GREATER_EQUALS, relational, parse_binary_expr)
+	// led(lexer.EQUALS, relational, parse_binary_expr)
+	// led(lexer.NOT_EQUALS, relational, parse_binary_expr)
 
 	// Additive & Multiplicative
-	led(lexer.PLUS, additive, parse_binary_expr)
-	led(lexer.DASH, additive, parse_binary_expr)
-	led(lexer.STAR, multiplicative, parse_binary_expr)
-	led(lexer.SLASH, multiplicative, parse_binary_expr)
-	led(lexer.PERCENT, multiplicative, parse_binary_expr)
+	// led(lexer.PLUS, additive, parse_binary_expr)
+	// led(lexer.DASH, additive, parse_binary_expr)
+	// led(lexer.STAR, multiplicative, parse_binary_expr)
+	// led(lexer.SLASH, multiplicative, parse_binary_expr)
+	// led(lexer.PERCENT, multiplicative, parse_binary_expr)
 
 	// Literals $ Symbols
-	nud(lexer.NUMBER, parse_primary_expr)
-	nud(lexer.STRING, parse_primary_expr)
-	nud(lexer.IDENTIFIER, parse_primary_expr)
-	nud(lexer.DASH, parse_prefix_expr)
-	nud(lexer.OPEN_PAREN, parse_grouping_expr)
+	// nud(lexer.NUMBER, parse_primary_expr)
+	// nud(lexer.STRING, parse_primary_expr)
+	// nud(lexer.IDENTIFIER, parse_primary_expr)
+	// nud(lexer.DASH, parse_prefix_expr)
+	// nud(lexer.OPEN_PAREN, parse_grouping_expr)
 
 	// Statements
-	stmt(lexer.LET, parse_var_decl_stmt)
-	stmt(lexer.VAR, parse_var_decl_stmt)
-	stmt(lexer.CONST, parse_var_decl_stmt)
-	stmt(lexer.IMPORT, parse_import_stmt)
-	stmt(lexer.FUNC, parse_func_stmt)
-	stmt(lexer.RETURN, parse_return_stmt)
+	// stmt(lexer.LET, parse_var_decl_stmt)
+	// stmt(lexer.VAR, parse_var_decl_stmt)
+	// stmt(lexer.CONST, parse_var_decl_stmt)
+	// stmt(lexer.IMPORT, parse_import_stmt)
+	// stmt(lexer.FUNC, parse_func_stmt)
+	// stmt(lexer.RETURN, parse_return_stmt)
+	stmt(lexer.CREATE, parseCreateStmt)
 }

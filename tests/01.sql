@@ -1,3 +1,2 @@
 CREATE DATABASE test_db;
 
-SELECT * FROM User;
