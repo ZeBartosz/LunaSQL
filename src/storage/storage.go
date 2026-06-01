@@ -31,20 +31,29 @@ func Storage(n ast.Stmt) {
 	}
 
 	executor.engine = engine
-	generateStatement(n, executor)
+	generateStatement(n, &executor)
 }
 
-func generateStatement(stmt ast.Stmt, exec Executor) {
+func generateStatement(stmt ast.Stmt, exec *Executor) {
 	switch n := stmt.(type) {
 	case ast.BlockStmt:
 		generateBlockStmt(n, exec)
 	case ast.CreateDatabaseStmt:
-		db, err := generateCreateStmt(n, exec.engine)
+		db, err := generateCreateDatabaseStmt(n, exec.engine)
 		if err != nil {
 			panic(err)
 		}
 
 		exec.database = db
+	case ast.CreateTableStmt:
+		if exec.database == nil {
+			panic("Database not set")
+		}
+
+		err := generateCreateTableStmt(n, exec.database)
+		if err != nil {
+			panic(err)
+		}
 	default:
 		fmt.Printf("// Unsupported statement type: %T\n", stmt)
 	}

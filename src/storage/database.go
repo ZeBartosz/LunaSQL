@@ -86,6 +86,8 @@ func (db *Database) CreateTable(name string, columns []string) (*Table, error) {
 		return nil, err
 	}
 	db.Tables[name] = table
+	fmt.Printf("Table %s created", name)
+
 	return table, nil
 }
 

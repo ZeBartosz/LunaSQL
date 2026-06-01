@@ -30,13 +30,38 @@ func parseExprStmt(p *parser) (ast.Stmt, error) {
 
 func parseCreateStmt(p *parser) (ast.Stmt, error) {
 	p.expect(lexer.CREATE)
-	p.expect(lexer.DATABASE)
+	tokenKind := p.advance().Kind
 
-	databaseName := p.expect(lexer.IDENTIFIER)
+	if tokenKind == lexer.DATABASE {
+		databaseName := p.expect(lexer.IDENTIFIER)
+		p.expect(lexer.SEMICOLON)
 
-	p.expect(lexer.SEMICOLON)
+		return ast.CreateDatabaseStmt{
+			DatabaseName: databaseName.Value,
+		}, nil
+	}
 
-	return ast.CreateDatabaseStmt{
-		TableName: databaseName.Value,
-	}, nil
+	if tokenKind == lexer.TABLE {
+		tableName := p.expect(lexer.IDENTIFIER)
+		p.expect(lexer.OPEN_PAREN)
+		var columns []string
+
+		for p.currentTokenKind() != lexer.CLOSE_PAREN {
+			columnName := p.expect(lexer.IDENTIFIER).Value
+			columns = append(columns, columnName)
+
+			if p.currentTokenKind() == lexer.COMMA {
+				p.advance()
+			}
+		}
+
+		p.expect(lexer.CLOSE_PAREN)
+
+		return ast.CreateTableStmt{
+			TableName: tableName.Value,
+			Column:    columns,
+		}, nil
+	}
+
+	panic("Create expects DATABASE or TABLE token after CREATE")
 }

@@ -28,7 +28,14 @@ const (
 	Value
 
 	SEMICOLON
+	OPEN_BRACKET
+	CLOSE_BRACKET
+	OPEN_CURLY
+	CLOSE_CURLY
+	OPEN_PAREN
+	CLOSE_PAREN
 
+	COMMA
 	STAR
 )
 
@@ -101,6 +108,20 @@ func TokenKindString(kind TokenKind) string {
 		return "IDENTIFIER"
 	case SEMICOLON:
 		return "SEMICOLON"
+	case OPEN_BRACKET:
+		return "open_bracket"
+	case CLOSE_BRACKET:
+		return "close_bracket"
+	case OPEN_CURLY:
+		return "open_curly"
+	case CLOSE_CURLY:
+		return "close_curly"
+	case OPEN_PAREN:
+		return "open_paren"
+	case CLOSE_PAREN:
+		return "close_paren"
+	case COMMA:
+		return "COMMA"
 	case STAR:
 		return "STAR"
 	default:

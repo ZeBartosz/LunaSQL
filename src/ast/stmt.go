@@ -13,7 +13,14 @@ type ExprStmt struct {
 func (n ExprStmt) stmt() {}
 
 type CreateDatabaseStmt struct {
-	TableName string
+	DatabaseName string
 }
 
 func (n CreateDatabaseStmt) stmt() {}
+
+type CreateTableStmt struct {
+	TableName string
+	Column    []string
+}
+
+func (n CreateTableStmt) stmt() {}
