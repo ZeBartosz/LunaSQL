@@ -6,6 +6,7 @@ import (
 
 	"github.com/ZeBartosz/LunaSQL/src/lexer"
 	"github.com/ZeBartosz/LunaSQL/src/parser"
+	"github.com/ZeBartosz/LunaSQL/src/storage"
 	"github.com/sanity-io/litter"
 )
 
@@ -31,6 +32,9 @@ func main() {
 
 	fmt.Println("\n--- Abstract Syntax Tree ---")
 	litter.Dump(ast)
+
+	fmt.Println("\n--- StorageAction ---")
+	storage.Storage(ast)
 
 	fmt.Println("\nFile read successfully, no errors found.")
 }
