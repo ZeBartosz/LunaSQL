@@ -28,13 +28,19 @@ func Storage(n ast.Stmt) {
 }
 
 func generateStatement(stmt ast.Stmt, eng *Engine) {
+	var _ *Database
 	switch n := stmt.(type) {
 	case ast.BlockStmt:
 		generateBlockStmt(n, eng)
 	case ast.CreateStmt:
-		generateCreateStmt(n, eng)
+		db, err := generateCreateStmt(n, eng)
+		if err != nil {
+			panic(err)
+		}
+
+		_ = db
 	default:
-		fmt.Sprintf("// Unsupported statement type: %T\n", stmt)
+		fmt.Printf("// Unsupported statement type: %T\n", stmt)
 	}
 }
 

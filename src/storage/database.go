@@ -34,6 +34,7 @@ func (e *Engine) CreateDatabase(name string) (*Database, error) {
 		return nil, err
 	}
 
+	fmt.Printf("Database Created: %s\n", name)
 	return &Database{Name: name, path: path, Tables: map[string]*Table{}}, nil
 }
 

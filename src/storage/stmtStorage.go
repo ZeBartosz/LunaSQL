@@ -14,6 +14,6 @@ func generateBlockStmt(block ast.BlockStmt, eng *Engine) {
 	}
 }
 
-func generateCreateStmt(createStmt ast.CreateStmt, eng *Engine) {
-	eng.CreateDatabase(createStmt.TableName)
+func generateCreateStmt(createStmt ast.CreateStmt, eng *Engine) (*Database, error) {
+	return eng.CreateDatabase(createStmt.TableName)
 }
