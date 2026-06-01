@@ -8,6 +8,21 @@ import (
 	"path/filepath"
 )
 
+// Database is a collection of tables stored under Root/Name.
+type Database struct {
+	Name   string
+	path   string
+	Tables map[string]*Table
+}
+
+// Table is a tiny row-store. Each row is a map from column name to string value.
+type Table struct {
+	Name    string              `json:"name"`
+	Columns []string            `json:"columns"`
+	Rows    []map[string]string `json:"rows"`
+	path    string              `json:"-"`
+}
+
 // CreateDatabase creates a database directory and returns it.
 func (e *Engine) CreateDatabase(name string) (*Database, error) {
 	if name == "" {

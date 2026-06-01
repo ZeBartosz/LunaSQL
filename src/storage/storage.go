@@ -18,21 +18,6 @@ type Engine struct {
 	Root string
 }
 
-// Database is a collection of tables stored under Root/Name.
-type Database struct {
-	Name   string
-	path   string
-	Tables map[string]*Table
-}
-
-// Table is a tiny row-store. Each row is a map from column name to string value.
-type Table struct {
-	Name    string              `json:"name"`
-	Columns []string            `json:"columns"`
-	Rows    []map[string]string `json:"rows"`
-	path    string              `json:"-"`
-}
-
 func Storage(n ast.Stmt) {
 	engine, err := NewEngine("./database")
 	if err != nil {
