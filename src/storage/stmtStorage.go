@@ -1,6 +1,9 @@
 package storage
 
 import (
+	"fmt"
+	"path/filepath"
+
 	"github.com/ZeBartosz/LunaSQL/src/ast"
 )
 
@@ -36,4 +39,31 @@ func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error 
 
 func insertToTableStmt(insertStmt ast.InsertIntoTable, db *Database) error {
 	return db.Tables[insertStmt.TableName].Insert(insertStmt.Insert)
+}
+func selectFromTableStmt(selectStmt ast.SelectFromTable, db *Database) error {
+	if table, ok := db.Tables[selectStmt.TableName]; ok {
+		rows := table.SelectAll()
+
+		fmt.Printf("\nTable: %s\n", selectStmt.TableName)
+		for _, r := range rows {
+			for k, v := range r {
+				fmt.Println("Key:", k, "Value:", v)
+			}
+		}
+	} else {
+		tablePath := filepath.Join(db.path, selectStmt.TableName+".table.json")
+		table, err := loadTable(tablePath)
+		if err != nil {
+			return err
+		}
+		rows := table.SelectAll()
+
+		fmt.Printf("Table: %s", selectStmt.TableName)
+		for _, r := range rows {
+			for k, v := range r {
+				fmt.Println("Key:", k, "Value:", v)
+			}
+		}
+	}
+	return nil
 }

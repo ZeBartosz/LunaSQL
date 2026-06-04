@@ -62,6 +62,15 @@ func generateStatement(stmt ast.Stmt, exec *Executor) {
 		if err != nil {
 			panic(err)
 		}
+	case ast.SelectFromTable:
+		if exec.database == nil {
+			panic("Database not set")
+		}
+
+		err := selectFromTableStmt(n, exec.database)
+		if err != nil {
+			panic(err)
+		}
 	default:
 		fmt.Printf("// Unsupported statement type: %T\n", stmt)
 	}

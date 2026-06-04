@@ -106,3 +106,22 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 		Insert:    insertValues,
 	}, nil
 }
+func parseSelectStmt(p *parser) (ast.Stmt, error) {
+	p.advance()
+	var colums []string
+
+	if p.currentTokenKind() == lexer.STAR {
+		colums = append(colums, lexer.TokenKindString(lexer.STAR))
+		p.advance()
+	}
+
+	p.expect(lexer.FROM)
+	tableName := p.expect(lexer.IDENTIFIER).Value
+
+	p.expect(lexer.SEMICOLON)
+
+	return ast.SelectFromTable{
+		TableName: tableName,
+		Columns:   colums,
+	}, nil
+}

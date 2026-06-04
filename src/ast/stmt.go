@@ -31,3 +31,10 @@ type InsertIntoTable struct {
 }
 
 func (n InsertIntoTable) stmt() {}
+
+type SelectFromTable struct {
+	TableName string
+	Columns   []string
+}
+
+func (n SelectFromTable) stmt() {}
