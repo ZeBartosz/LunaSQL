@@ -21,6 +21,7 @@ type Engine struct {
 type Executor struct {
 	engine   *Engine
 	database *Database
+	Table    *Table
 }
 
 func Storage(n ast.Stmt) {
@@ -39,18 +40,25 @@ func generateStatement(stmt ast.Stmt, exec *Executor) {
 	case ast.BlockStmt:
 		generateBlockStmt(n, exec)
 	case ast.CreateDatabaseStmt:
-		db, err := generateCreateDatabaseStmt(n, exec.engine)
+		err := generateCreateDatabaseStmt(n, exec)
 		if err != nil {
 			panic(err)
 		}
-
-		exec.database = db
 	case ast.CreateTableStmt:
 		if exec.database == nil {
 			panic("Database not set")
 		}
 
 		err := generateCreateTableStmt(n, exec.database)
+		if err != nil {
+			panic(err)
+		}
+	case ast.InsertIntoTable:
+		if exec.database == nil {
+			panic("Database not set")
+		}
+
+		err := insertToTableStmt(n, exec.database)
 		if err != nil {
 			panic(err)
 		}

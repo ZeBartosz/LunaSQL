@@ -136,6 +136,8 @@ func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 		kind = WHERE
 	case "INSERT":
 		kind = INSERT
+	case "VALUES":
+		kind = VALUES
 	case "UPDATE":
 		kind = UPDATE
 	case "DELETE":
@@ -152,6 +154,8 @@ func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 		kind = DATABASE
 	case "COLUMN":
 		kind = COLUMN
+	case "INTO":
+		kind = INTO
 	}
 
 	lex.push(NewToken(kind, match))

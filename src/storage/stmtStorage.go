@@ -14,11 +14,26 @@ func generateBlockStmt(block ast.BlockStmt, exec *Executor) {
 	}
 }
 
-func generateCreateDatabaseStmt(createStmt ast.CreateDatabaseStmt, eng *Engine) (*Database, error) {
-	return eng.CreateDatabase(createStmt.DatabaseName)
+func generateCreateDatabaseStmt(createStmt ast.CreateDatabaseStmt, exec *Executor) error {
+	db, err := exec.engine.CreateDatabase(createStmt.DatabaseName)
+	if err != nil {
+		return err
+	}
+
+	exec.database = db
+	return nil
 }
 
 func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error {
-	_, err := db.CreateTable(tableStmt.TableName, tableStmt.Column)
-	return err
+	table, err := db.CreateTable(tableStmt.TableName, tableStmt.Column)
+	if err != nil {
+		return err
+	}
+
+	db.Tables[table.Name] = table
+	return nil
+}
+
+func insertToTableStmt(insertStmt ast.InsertIntoTable, db *Database) error {
+	return db.Tables[insertStmt.TableName].Insert(insertStmt.Insert)
 }

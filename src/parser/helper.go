@@ -40,7 +40,7 @@ func (p *parser) expectError(expectedKind lexer.TokenKind, errStr string) (lexer
 	value := token.Value
 
 	if kind != expectedKind {
-		err := fmt.Errorf("expected: %s but received: %s, value: %s instead", lexer.TokenKindString(expectedKind), lexer.TokenKindString(kind), value)
+		err := fmt.Errorf("expected: %s but received: %s, value: %s instead, at position %d", lexer.TokenKindString(expectedKind), lexer.TokenKindString(kind), value, p.pos)
 		if errStr != "" {
 			err = fmt.Errorf("%s: %w", errStr, err)
 		}

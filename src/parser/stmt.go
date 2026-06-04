@@ -56,6 +56,7 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 		}
 
 		p.expect(lexer.CLOSE_PAREN)
+		p.expect(lexer.SEMICOLON)
 
 		return ast.CreateTableStmt{
 			TableName: tableName.Value,
@@ -64,4 +65,44 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 	}
 
 	panic("Create expects DATABASE or TABLE token after CREATE")
+}
+
+func parseInsertStmt(p *parser) (ast.Stmt, error) {
+	p.advance()
+	p.expect(lexer.INTO)
+
+	tableName := p.expect(lexer.IDENTIFIER).Value
+	insertValues := make(map[string]string)
+
+	p.expect(lexer.OPEN_PAREN)
+	for p.currentTokenKind() != lexer.CLOSE_PAREN {
+
+		columnName := p.expect(lexer.IDENTIFIER).Value
+		insertValues[columnName] = ""
+
+		if p.currentTokenKind() == lexer.COMMA {
+			p.advance()
+		}
+	}
+
+	p.expect(lexer.CLOSE_PAREN)
+	p.expect(lexer.VALUES)
+	p.expect(lexer.OPEN_PAREN)
+
+	for k, _ := range insertValues {
+		valueToInsert := p.expect(lexer.IDENTIFIER).Value
+		insertValues[k] = valueToInsert
+
+		if p.currentTokenKind() == lexer.COMMA {
+			p.advance()
+		}
+	}
+
+	p.expect(lexer.CLOSE_PAREN)
+	p.expect(lexer.SEMICOLON)
+
+	return ast.InsertIntoTable{
+		TableName: tableName,
+		Insert:    insertValues,
+	}, nil
 }

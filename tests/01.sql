@@ -1,3 +1,5 @@
 CREATE DATABASE test_db;
 
-CREATE TABLE User (id, name)
+CREATE TABLE user (id, name);
+
+INSERT INTO user (id, name) VALUES (one, John);

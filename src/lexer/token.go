@@ -25,6 +25,8 @@ const (
 	DROP
 
 	COLUMN
+	VALUES
+	INTO
 	Value
 
 	SEMICOLON
@@ -82,6 +84,10 @@ func TokenKindString(kind TokenKind) string {
 		return "WHERE"
 	case INSERT:
 		return "INSERT"
+	case INTO:
+		return "INTO"
+	case VALUES:
+		return "VALUES"
 	case UPDATE:
 		return "UPDATE"
 	case DELETE:

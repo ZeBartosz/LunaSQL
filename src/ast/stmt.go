@@ -24,3 +24,10 @@ type CreateTableStmt struct {
 }
 
 func (n CreateTableStmt) stmt() {}
+
+type InsertIntoTable struct {
+	TableName string
+	Insert    map[string]string
+}
+
+func (n InsertIntoTable) stmt() {}
