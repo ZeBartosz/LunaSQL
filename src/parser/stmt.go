@@ -72,13 +72,14 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 	p.expect(lexer.INTO)
 
 	tableName := p.expect(lexer.IDENTIFIER).Value
-	insertValues := make(map[string]string)
+	var columns []string
 
 	p.expect(lexer.OPEN_PAREN)
+
 	for p.currentTokenKind() != lexer.CLOSE_PAREN {
 
 		columnName := p.expect(lexer.IDENTIFIER).Value
-		insertValues[columnName] = ""
+		columns = append(columns, columnName)
 
 		if p.currentTokenKind() == lexer.COMMA {
 			p.advance()
@@ -89,13 +90,22 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 	p.expect(lexer.VALUES)
 	p.expect(lexer.OPEN_PAREN)
 
-	for k, _ := range insertValues {
-		valueToInsert := p.expect(lexer.IDENTIFIER).Value
-		insertValues[k] = valueToInsert
+	var values []string
+
+	for p.currentTokenKind() != lexer.CLOSE_PAREN {
+
+		value := p.expect(lexer.IDENTIFIER).Value
+		values = append(values, value)
 
 		if p.currentTokenKind() == lexer.COMMA {
 			p.advance()
 		}
+	}
+
+	row := map[string]string{}
+
+	for i, column := range columns {
+		row[column] = values[i]
 	}
 
 	p.expect(lexer.CLOSE_PAREN)
@@ -103,7 +113,7 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 
 	return ast.InsertIntoTable{
 		TableName: tableName,
-		Insert:    insertValues,
+		Insert:    row,
 	}, nil
 }
 func parseSelectStmt(p *parser) (ast.Stmt, error) {
