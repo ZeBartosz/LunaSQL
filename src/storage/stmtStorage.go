@@ -31,12 +31,11 @@ func generateCreateDatabaseStmt(createStmt ast.CreateDatabaseStmt, exec *Executo
 }
 
 func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error {
-	table, err := db.CreateTable(tableStmt.TableName, tableStmt.Column)
+	_, err := db.CreateTable(tableStmt.TableName, tableStmt.Column)
 	if err != nil {
 		return err
 	}
 
-	db.Tables[table.Name] = table
 	return nil
 }
 
