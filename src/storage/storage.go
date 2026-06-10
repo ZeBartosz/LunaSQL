@@ -42,22 +42,10 @@ func generateStatement(stmt ast.Stmt, exec *Executor) error {
 	case ast.CreateDatabaseStmt:
 		return generateCreateDatabaseStmt(n, exec)
 	case ast.CreateTableStmt:
-		if exec.database == nil {
-			return fmt.Errorf("database not set")
-		}
-
 		return generateCreateTableStmt(n, exec.database)
 	case ast.InsertIntoTable:
-		if exec.database == nil {
-			return fmt.Errorf("database not set")
-		}
-
 		return insertToTableStmt(n, exec.database)
 	case ast.SelectFromTable:
-		if exec.database == nil {
-			return fmt.Errorf("database not set")
-		}
-
 		return selectFromTableStmt(n, exec.database)
 	default:
 		return fmt.Errorf("unsupported statement type: %T", stmt)

@@ -72,6 +72,10 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 			}
 			columns = append(columns, columnName.Value)
 
+			if p.currentTokenKind() == lexer.IDENTIFIER {
+				p.advance()
+			}
+
 			if p.currentTokenKind() == lexer.COMMA {
 				p.advance()
 			}
@@ -140,11 +144,14 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 
 	for p.currentTokenKind() != lexer.CLOSE_PAREN {
 
-		value, err := p.expect(lexer.IDENTIFIER)
-		if err != nil {
-			return nil, err
+		tk := p.currentToken()
+		switch tk.Kind {
+		case lexer.STRING, lexer.NUMBER, lexer.IDENTIFIER:
+			values = append(values, tk.Value)
+			p.advance()
+		default:
+			return nil, fmt.Errorf("expected value (STRING, NUMBER, or IDENTIFIER), got %s at position %d", lexer.TokenKindString(tk.Kind), p.pos)
 		}
-		values = append(values, value.Value)
 
 		if p.currentTokenKind() == lexer.COMMA {
 			p.advance()

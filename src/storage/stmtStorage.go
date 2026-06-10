@@ -31,6 +31,10 @@ func generateCreateDatabaseStmt(createStmt ast.CreateDatabaseStmt, exec *Executo
 }
 
 func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error {
+	if db == nil {
+		return fmt.Errorf("database not set")
+	}
+
 	_, err := db.CreateTable(tableStmt.TableName, tableStmt.Column)
 	if err != nil {
 		return err
@@ -40,14 +44,29 @@ func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error 
 }
 
 func insertToTableStmt(insertStmt ast.InsertIntoTable, db *Database) error {
+	if db == nil {
+		return fmt.Errorf("Database not set")
+	}
+
 	table, ok := db.Tables[insertStmt.TableName]
 	if !ok {
-		return fmt.Errorf("table %q does not exist", insertStmt.TableName)
+		tablePath := filepath.Join(db.path, insertStmt.TableName+".table.json")
+		loaded, err := loadTable(tablePath)
+		if err != nil {
+			return fmt.Errorf("Table %q does not exist", insertStmt.TableName)
+		}
+		db.Tables[insertStmt.TableName] = loaded
+		table = loaded
 	}
 
 	return table.Insert(insertStmt.Insert)
 }
+
 func selectFromTableStmt(selectStmt ast.SelectFromTable, db *Database) error {
+	if db == nil {
+		return fmt.Errorf("database not set")
+	}
+
 	if table, ok := db.Tables[selectStmt.TableName]; ok {
 		rows := table.SelectAll()
 
