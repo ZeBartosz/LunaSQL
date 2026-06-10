@@ -24,55 +24,43 @@ type Executor struct {
 	Table    *Table
 }
 
-func Storage(n ast.Stmt) {
+func Storage(n ast.Stmt) error {
 	var executor Executor
 	engine, err := NewEngine("./database")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	executor.engine = engine
-	generateStatement(n, &executor)
+	return generateStatement(n, &executor)
 }
 
-func generateStatement(stmt ast.Stmt, exec *Executor) {
+func generateStatement(stmt ast.Stmt, exec *Executor) error {
 	switch n := stmt.(type) {
 	case ast.BlockStmt:
-		generateBlockStmt(n, exec)
+		return generateBlockStmt(n, exec)
 	case ast.CreateDatabaseStmt:
-		err := generateCreateDatabaseStmt(n, exec)
-		if err != nil {
-			panic(err)
-		}
+		return generateCreateDatabaseStmt(n, exec)
 	case ast.CreateTableStmt:
 		if exec.database == nil {
-			panic("Database not set")
+			return fmt.Errorf("database not set")
 		}
 
-		err := generateCreateTableStmt(n, exec.database)
-		if err != nil {
-			panic(err)
-		}
+		return generateCreateTableStmt(n, exec.database)
 	case ast.InsertIntoTable:
 		if exec.database == nil {
-			panic("Database not set")
+			return fmt.Errorf("database not set")
 		}
 
-		err := insertToTableStmt(n, exec.database)
-		if err != nil {
-			panic(err)
-		}
+		return insertToTableStmt(n, exec.database)
 	case ast.SelectFromTable:
 		if exec.database == nil {
-			panic("Database not set")
+			return fmt.Errorf("database not set")
 		}
 
-		err := selectFromTableStmt(n, exec.database)
-		if err != nil {
-			panic(err)
-		}
+		return selectFromTableStmt(n, exec.database)
 	default:
-		fmt.Printf("// Unsupported statement type: %T\n", stmt)
+		return fmt.Errorf("unsupported statement type: %T", stmt)
 	}
 }
 

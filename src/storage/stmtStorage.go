@@ -11,10 +11,13 @@ import (
 //		gen.writeln(generateExpression(stmt.Expression) + ";\n")
 //	}
 
-func generateBlockStmt(block ast.BlockStmt, exec *Executor) {
+func generateBlockStmt(block ast.BlockStmt, exec *Executor) error {
 	for _, stmt := range block.Body {
-		generateStatement(stmt, exec)
+		if err := generateStatement(stmt, exec); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func generateCreateDatabaseStmt(createStmt ast.CreateDatabaseStmt, exec *Executor) error {
@@ -38,7 +41,12 @@ func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error 
 }
 
 func insertToTableStmt(insertStmt ast.InsertIntoTable, db *Database) error {
-	return db.Tables[insertStmt.TableName].Insert(insertStmt.Insert)
+	table, ok := db.Tables[insertStmt.TableName]
+	if !ok {
+		return fmt.Errorf("table %q does not exist", insertStmt.TableName)
+	}
+
+	return table.Insert(insertStmt.Insert)
 }
 func selectFromTableStmt(selectStmt ast.SelectFromTable, db *Database) error {
 	if table, ok := db.Tables[selectStmt.TableName]; ok {
@@ -58,7 +66,7 @@ func selectFromTableStmt(selectStmt ast.SelectFromTable, db *Database) error {
 		}
 		rows := table.SelectAll()
 
-		fmt.Printf("Table: %s", selectStmt.TableName)
+		fmt.Printf("Table: %s\n", selectStmt.TableName)
 		for _, r := range rows {
 			for k, v := range r {
 				fmt.Println("Key:", k, "Value:", v)

@@ -80,6 +80,9 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 		if _, err := p.expect(lexer.CLOSE_PAREN); err != nil {
 			return nil, err
 		}
+		if len(columns) == 0 {
+			return nil, fmt.Errorf("CREATE TABLE requires at least one column")
+		}
 		if _, err := p.expect(lexer.SEMICOLON); err != nil {
 			return nil, err
 		}
@@ -150,6 +153,10 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 
 	row := map[string]string{}
 
+	if len(columns) != len(values) {
+		return nil, fmt.Errorf("INSERT column count (%d) does not match value count (%d)", len(columns), len(values))
+	}
+
 	for i, column := range columns {
 		row[column] = values[i]
 	}
@@ -166,12 +173,13 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 		Insert:    row,
 	}, nil
 }
+
 func parseSelectStmt(p *parser) (ast.Stmt, error) {
 	p.advance()
-	var colums []string
+	var columns []string
 
 	if p.currentTokenKind() == lexer.STAR {
-		colums = append(colums, lexer.TokenKindString(lexer.STAR))
+		columns = append(columns, lexer.TokenKindString(lexer.STAR))
 		p.advance()
 	}
 
@@ -188,6 +196,6 @@ func parseSelectStmt(p *parser) (ast.Stmt, error) {
 
 	return ast.SelectFromTable{
 		TableName: tableName.Value,
-		Columns:   colums,
+		Columns:   columns,
 	}, nil
 }
