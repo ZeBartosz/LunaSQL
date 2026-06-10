@@ -93,6 +93,13 @@ func createLexer(source string) *lexer {
 			{regexp.MustCompile(`'[^']*'`), stringHandler},
 			{regexp.MustCompile(`\s+`), skipHandler},
 			{regexp.MustCompile(`;`), defaultHandler(SEMICOLON, ";")},
+			{regexp.MustCompile(`\[`), defaultHandler(OPEN_BRACKET, "[")},
+			{regexp.MustCompile(`\]`), defaultHandler(CLOSE_BRACKET, "]")},
+			{regexp.MustCompile(`\{`), defaultHandler(OPEN_CURLY, "{")},
+			{regexp.MustCompile(`\}`), defaultHandler(CLOSE_CURLY, "}")},
+			{regexp.MustCompile(`\(`), defaultHandler(OPEN_PAREN, "(")},
+			{regexp.MustCompile(`\)`), defaultHandler(CLOSE_PAREN, ")")},
+			{regexp.MustCompile(`\,`), defaultHandler(COMMA, ",")},
 			{regexp.MustCompile(`\*`), defaultHandler(STAR, "*")},
 		},
 	}
@@ -129,6 +136,8 @@ func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 		kind = WHERE
 	case "INSERT":
 		kind = INSERT
+	case "VALUES":
+		kind = VALUES
 	case "UPDATE":
 		kind = UPDATE
 	case "DELETE":
@@ -145,6 +154,8 @@ func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 		kind = DATABASE
 	case "COLUMN":
 		kind = COLUMN
+	case "INTO":
+		kind = INTO
 	}
 
 	lex.push(NewToken(kind, match))

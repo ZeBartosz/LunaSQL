@@ -40,7 +40,7 @@ func (p *parser) expectError(expectedKind lexer.TokenKind, errStr string) (lexer
 	value := token.Value
 
 	if kind != expectedKind {
-		err := fmt.Errorf("expected: %s but received: %s, value: %s instead", lexer.TokenKindString(expectedKind), lexer.TokenKindString(kind), value)
+		err := fmt.Errorf("expected: %s but received: %s, value: %s instead, at position %d", lexer.TokenKindString(expectedKind), lexer.TokenKindString(kind), value, p.pos)
 		if errStr != "" {
 			err = fmt.Errorf("%s: %w", errStr, err)
 		}
@@ -51,10 +51,10 @@ func (p *parser) expectError(expectedKind lexer.TokenKind, errStr string) (lexer
 }
 
 // checks if the token is the one we expect
-func (p *parser) expect(expectedKind lexer.TokenKind) lexer.Token {
+func (p *parser) expect(expectedKind lexer.TokenKind) (lexer.Token, error) {
 	tok, err := p.expectError(expectedKind, "")
 	if err != nil {
-		panic(err)
+		return tok, err
 	}
-	return tok
+	return tok, nil
 }

@@ -28,7 +28,7 @@ func Parse(tokens []lexer.Token) (ast.Stmt, error) {
 
 	// Iterate until we reach the end of the file
 	for p.hasToken() {
-		stmt, err := parse_stmt(p)
+		stmt, err := parseStmt(p)
 		if err != nil {
 			return nil, err
 		}

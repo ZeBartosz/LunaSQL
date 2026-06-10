@@ -25,10 +25,19 @@ const (
 	DROP
 
 	COLUMN
+	VALUES
+	INTO
 	Value
 
 	SEMICOLON
+	OPEN_BRACKET
+	CLOSE_BRACKET
+	OPEN_CURLY
+	CLOSE_CURLY
+	OPEN_PAREN
+	CLOSE_PAREN
 
+	COMMA
 	STAR
 )
 
@@ -75,6 +84,10 @@ func TokenKindString(kind TokenKind) string {
 		return "WHERE"
 	case INSERT:
 		return "INSERT"
+	case INTO:
+		return "INTO"
+	case VALUES:
+		return "VALUES"
 	case UPDATE:
 		return "UPDATE"
 	case DELETE:
@@ -101,6 +114,20 @@ func TokenKindString(kind TokenKind) string {
 		return "IDENTIFIER"
 	case SEMICOLON:
 		return "SEMICOLON"
+	case OPEN_BRACKET:
+		return "OPEN_BRACKET"
+	case CLOSE_BRACKET:
+		return "CLOSE_BRACKET"
+	case OPEN_CURLY:
+		return "OPEN_CURLY"
+	case CLOSE_CURLY:
+		return "CLOSE_CURLY"
+	case OPEN_PAREN:
+		return "OPEN_PAREN"
+	case CLOSE_PAREN:
+		return "CLOSE_PAREN"
+	case COMMA:
+		return "COMMA"
 	case STAR:
 		return "STAR"
 	default:
