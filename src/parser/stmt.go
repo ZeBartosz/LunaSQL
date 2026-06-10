@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/ZeBartosz/LunaSQL/src/ast"
 	"github.com/ZeBartosz/LunaSQL/src/lexer"
 )
@@ -21,7 +23,10 @@ func parseStmt(p *parser) (ast.Stmt, error) {
 }
 
 func parseExprStmt(p *parser) (ast.Stmt, error) {
-	expression := parseExpr(p, defalt_bp)
+	expression, err := parseExpr(p, defalt_bp)
+	if err != nil {
+		return nil, err
+	}
 
 	return ast.ExprStmt{
 		Expression: expression,
@@ -29,12 +34,20 @@ func parseExprStmt(p *parser) (ast.Stmt, error) {
 }
 
 func parseCreateStmt(p *parser) (ast.Stmt, error) {
-	p.expect(lexer.CREATE)
+	if _, err := p.expect(lexer.CREATE); err != nil {
+		return nil, err
+	}
 	tokenKind := p.advance().Kind
 
 	if tokenKind == lexer.DATABASE {
-		databaseName := p.expect(lexer.IDENTIFIER)
-		p.expect(lexer.SEMICOLON)
+		databaseName, err := p.expect(lexer.IDENTIFIER)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := p.expect(lexer.SEMICOLON); err != nil {
+			return nil, err
+		}
 
 		return ast.CreateDatabaseStmt{
 			DatabaseName: databaseName.Value,
@@ -42,21 +55,34 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 	}
 
 	if tokenKind == lexer.TABLE {
-		tableName := p.expect(lexer.IDENTIFIER)
-		p.expect(lexer.OPEN_PAREN)
+		tableName, err := p.expect(lexer.IDENTIFIER)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := p.expect(lexer.OPEN_PAREN); err != nil {
+			return nil, err
+		}
 		var columns []string
 
 		for p.currentTokenKind() != lexer.CLOSE_PAREN {
-			columnName := p.expect(lexer.IDENTIFIER).Value
-			columns = append(columns, columnName)
+			columnName, err := p.expect(lexer.IDENTIFIER)
+			if err != nil {
+				return nil, err
+			}
+			columns = append(columns, columnName.Value)
 
 			if p.currentTokenKind() == lexer.COMMA {
 				p.advance()
 			}
 		}
 
-		p.expect(lexer.CLOSE_PAREN)
-		p.expect(lexer.SEMICOLON)
+		if _, err := p.expect(lexer.CLOSE_PAREN); err != nil {
+			return nil, err
+		}
+		if _, err := p.expect(lexer.SEMICOLON); err != nil {
+			return nil, err
+		}
 
 		return ast.CreateTableStmt{
 			TableName: tableName.Value,
@@ -64,38 +90,58 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 		}, nil
 	}
 
-	panic("Create expects DATABASE or TABLE token after CREATE")
+	return nil, fmt.Errorf("Create expects DATABASE or TABLE token after CREATE")
 }
 
 func parseInsertStmt(p *parser) (ast.Stmt, error) {
 	p.advance()
-	p.expect(lexer.INTO)
+	if _, err := p.expect(lexer.INTO); err != nil {
+		return nil, err
+	}
 
-	tableName := p.expect(lexer.IDENTIFIER).Value
+	tableName, err := p.expect(lexer.IDENTIFIER)
+	if err != nil {
+		return nil, err
+	}
+
 	var columns []string
 
-	p.expect(lexer.OPEN_PAREN)
+	if _, err := p.expect(lexer.OPEN_PAREN); err != nil {
+		return nil, err
+	}
 
 	for p.currentTokenKind() != lexer.CLOSE_PAREN {
 
-		columnName := p.expect(lexer.IDENTIFIER).Value
-		columns = append(columns, columnName)
+		columnName, err := p.expect(lexer.IDENTIFIER)
+		if err != nil {
+			return nil, err
+		}
+		columns = append(columns, columnName.Value)
 
 		if p.currentTokenKind() == lexer.COMMA {
 			p.advance()
 		}
 	}
 
-	p.expect(lexer.CLOSE_PAREN)
-	p.expect(lexer.VALUES)
-	p.expect(lexer.OPEN_PAREN)
+	if _, err := p.expect(lexer.CLOSE_PAREN); err != nil {
+		return nil, err
+	}
+	if _, err := p.expect(lexer.VALUES); err != nil {
+		return nil, err
+	}
+	if _, err := p.expect(lexer.OPEN_PAREN); err != nil {
+		return nil, err
+	}
 
 	var values []string
 
 	for p.currentTokenKind() != lexer.CLOSE_PAREN {
 
-		value := p.expect(lexer.IDENTIFIER).Value
-		values = append(values, value)
+		value, err := p.expect(lexer.IDENTIFIER)
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, value.Value)
 
 		if p.currentTokenKind() == lexer.COMMA {
 			p.advance()
@@ -108,11 +154,15 @@ func parseInsertStmt(p *parser) (ast.Stmt, error) {
 		row[column] = values[i]
 	}
 
-	p.expect(lexer.CLOSE_PAREN)
-	p.expect(lexer.SEMICOLON)
+	if _, err := p.expect(lexer.CLOSE_PAREN); err != nil {
+		return nil, err
+	}
+	if _, err := p.expect(lexer.SEMICOLON); err != nil {
+		return nil, err
+	}
 
 	return ast.InsertIntoTable{
-		TableName: tableName,
+		TableName: tableName.Value,
 		Insert:    row,
 	}, nil
 }
@@ -125,13 +175,19 @@ func parseSelectStmt(p *parser) (ast.Stmt, error) {
 		p.advance()
 	}
 
-	p.expect(lexer.FROM)
-	tableName := p.expect(lexer.IDENTIFIER).Value
-
-	p.expect(lexer.SEMICOLON)
+	if _, err := p.expect(lexer.FROM); err != nil {
+		return nil, err
+	}
+	tableName, err := p.expect(lexer.IDENTIFIER)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := p.expect(lexer.SEMICOLON); err != nil {
+		return nil, err
+	}
 
 	return ast.SelectFromTable{
-		TableName: tableName,
+		TableName: tableName.Value,
 		Columns:   colums,
 	}, nil
 }

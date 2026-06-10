@@ -27,8 +27,8 @@ const (
 // Function types used to handle parsing of different language constructs
 type (
 	stmt_handler func(p *parser) (ast.Stmt, error)
-	nud_handler  func(p *parser) ast.Expr
-	led_handler  func(p *parser, left ast.Expr, bp binding_power) ast.Expr
+	nud_handler  func(p *parser) (ast.Expr, error)
+	led_handler  func(p *parser, left ast.Expr, bp binding_power) (ast.Expr, error)
 )
 
 // Lookup tables that map token kinds to their respective handlers

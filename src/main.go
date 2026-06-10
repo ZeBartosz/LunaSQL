@@ -28,6 +28,7 @@ func main() {
 	ast, err := parser.Parse(tokens)
 	if err != nil {
 		fmt.Printf("Error parsing ast %v\n", err)
+		return
 	}
 
 	fmt.Println("\n--- Abstract Syntax Tree ---")

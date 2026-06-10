@@ -51,10 +51,10 @@ func (p *parser) expectError(expectedKind lexer.TokenKind, errStr string) (lexer
 }
 
 // checks if the token is the one we expect
-func (p *parser) expect(expectedKind lexer.TokenKind) lexer.Token {
+func (p *parser) expect(expectedKind lexer.TokenKind) (lexer.Token, error) {
 	tok, err := p.expectError(expectedKind, "")
 	if err != nil {
-		panic(err)
+		return tok, err
 	}
-	return tok
+	return tok, nil
 }
