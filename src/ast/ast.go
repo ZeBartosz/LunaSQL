@@ -12,3 +12,7 @@ type Stmt interface {
 type Expr interface {
 	expr()
 }
+
+type Type interface {
+	_type()
+}

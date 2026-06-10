@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 )
 
 // Database is a collection of tables stored under Root/Name.
@@ -19,7 +18,7 @@ type Database struct {
 // Table is a tiny row-store. Each row is a map from column name to string value.
 type Table struct {
 	Name    string              `json:"name"`
-	Columns []string            `json:"columns"`
+	Columns []Column            `json:"columns"`
 	Rows    []map[string]string `json:"rows"`
 	path    string              `json:"-"`
 }
@@ -66,7 +65,7 @@ func (e *Engine) OpenDatabase(name string) (*Database, error) {
 }
 
 // CreateTable creates an empty table with fixed column names.
-func (db *Database) CreateTable(name string, columns []string) (*Table, error) {
+func (db *Database) CreateTable(name string, columns []Column) (*Table, error) {
 	if name == "" {
 		return nil, errors.New("table name cannot be empty")
 	}
@@ -96,14 +95,14 @@ func (db *Database) CreateTable(name string, columns []string) (*Table, error) {
 func (t *Table) Insert(row map[string]string) error {
 	clean := map[string]string{}
 	for _, column := range t.Columns {
-		value, ok := row[column]
+		value, ok := row[column.Name]
 		if !ok {
-			return fmt.Errorf("missing value for column %q", column)
+			return fmt.Errorf("missing value for column %q", column.Name)
 		}
-		clean[column] = value
+		clean[column.Name] = value
 	}
 	for column := range row {
-		if !contains(t.Columns, column) {
+		if !containsColumn(t.Columns, column) {
 			return fmt.Errorf("unknown column %q", column)
 		}
 	}
@@ -146,6 +145,11 @@ func (t *Table) save() error {
 	return os.WriteFile(t.path, bytes, 0o644)
 }
 
-func contains(values []string, target string) bool {
-	return slices.Contains(values, target)
+func containsColumn(columns []Column, target string) bool {
+	for _, column := range columns {
+		if column.Name == target {
+			return true
+		}
+	}
+	return false
 }

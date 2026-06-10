@@ -23,7 +23,7 @@ func parseStmt(p *parser) (ast.Stmt, error) {
 }
 
 func parseExprStmt(p *parser) (ast.Stmt, error) {
-	expression, err := parseExpr(p, defalt_bp)
+	expression, err := parseExpr(p, defaultBP)
 	if err != nil {
 		return nil, err
 	}
@@ -63,18 +63,23 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 		if _, err := p.expect(lexer.OPEN_PAREN); err != nil {
 			return nil, err
 		}
-		var columns []string
+		var columns []ast.ColumnDef
 
 		for p.currentTokenKind() != lexer.CLOSE_PAREN {
 			columnName, err := p.expect(lexer.IDENTIFIER)
 			if err != nil {
 				return nil, err
 			}
-			columns = append(columns, columnName.Value)
 
-			if p.currentTokenKind() == lexer.IDENTIFIER {
-				p.advance()
+			columnType, err := parseType(p, defaultBP)
+			if err != nil {
+				return nil, err
 			}
+
+			columns = append(columns, ast.ColumnDef{
+				Name: columnName.Value,
+				Type: columnType,
+			})
 
 			if p.currentTokenKind() == lexer.COMMA {
 				p.advance()
@@ -93,7 +98,7 @@ func parseCreateStmt(p *parser) (ast.Stmt, error) {
 
 		return ast.CreateTableStmt{
 			TableName: tableName.Value,
-			Column:    columns,
+			Columns:   columns,
 		}, nil
 	}
 

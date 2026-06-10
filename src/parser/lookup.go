@@ -11,7 +11,7 @@ type binding_power int
 
 // Enum defining the binding power of various operators and expressions.
 const (
-	defalt_bp      binding_power = iota // Default (lowest precedence)
+	defaultBP      binding_power = iota // Default (lowest precedence)
 	comma                               // Comma operator (e.g., function arguments)
 	assignment                          // Assignment operators (=, +=, etc.)
 	logical                             // Logical operators (&&, ||)
@@ -60,7 +60,7 @@ func nud(kind lexer.TokenKind, nud_fn nud_handler) {
 
 // Registers a statement type in the lookup tables.
 func stmt(kind lexer.TokenKind, stmt_fn stmt_handler) {
-	bp_lu[kind] = defalt_bp
+	bp_lu[kind] = defaultBP
 	stmt_lu[kind] = stmt_fn
 }
 

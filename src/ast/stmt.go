@@ -18,9 +18,14 @@ type CreateDatabaseStmt struct {
 
 func (n CreateDatabaseStmt) stmt() {}
 
+type ColumnDef struct {
+	Name string
+	Type Type
+}
+
 type CreateTableStmt struct {
 	TableName string
-	Column    []string
+	Columns   []ColumnDef
 }
 
 func (n CreateTableStmt) stmt() {}

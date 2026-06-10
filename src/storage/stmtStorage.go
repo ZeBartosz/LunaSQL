@@ -35,7 +35,20 @@ func generateCreateTableStmt(tableStmt ast.CreateTableStmt, db *Database) error 
 		return fmt.Errorf("database not set")
 	}
 
-	_, err := db.CreateTable(tableStmt.TableName, tableStmt.Column)
+	var columns []Column
+	for _, v := range tableStmt.Columns {
+		storageType, err := toStorageType(v.Type)
+		if err != nil {
+			return err
+		}
+
+		columns = append(columns, Column{
+			Name: v.Name,
+			Type: storageType,
+		})
+	}
+
+	_, err := db.CreateTable(tableStmt.TableName, columns)
 	if err != nil {
 		return err
 	}
