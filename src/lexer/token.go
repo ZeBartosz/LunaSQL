@@ -115,17 +115,17 @@ func TokenKindString(kind TokenKind) string {
 	case SEMICOLON:
 		return "SEMICOLON"
 	case OPEN_BRACKET:
-		return "open_bracket"
+		return "OPEN_BRACKET"
 	case CLOSE_BRACKET:
-		return "close_bracket"
+		return "CLOSE_BRACKET"
 	case OPEN_CURLY:
-		return "open_curly"
+		return "OPEN_CURLY"
 	case CLOSE_CURLY:
-		return "close_curly"
+		return "CLOSE_CURLY"
 	case OPEN_PAREN:
-		return "open_paren"
+		return "OPEN_PAREN"
 	case CLOSE_PAREN:
-		return "close_paren"
+		return "CLOSE_PAREN"
 	case COMMA:
 		return "COMMA"
 	case STAR:
