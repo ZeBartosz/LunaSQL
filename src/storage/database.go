@@ -17,10 +17,10 @@ type Database struct {
 
 // Table is a tiny row-store. Each row is a map from column name to string value.
 type Table struct {
-	Name    string              `json:"name"`
-	Columns []Column            `json:"columns"`
-	Rows    []map[string]string `json:"rows"`
-	path    string              `json:"-"`
+	Name    string   `json:"name"`
+	Columns []Column `json:"columns"`
+	Rows    []Row    `json:"rows"`
+	path    string   `json:"-"`
 }
 
 // CreateDatabase creates a database directory and returns it.
@@ -79,7 +79,7 @@ func (db *Database) CreateTable(name string, columns []Column) (*Table, error) {
 	table := &Table{
 		Name:    name,
 		Columns: columns,
-		Rows:    []map[string]string{},
+		Rows:    []Row{},
 		path:    filepath.Join(db.path, name+".table.json"),
 	}
 	if err := table.save(); err != nil {
@@ -93,35 +93,34 @@ func (db *Database) CreateTable(name string, columns []Column) (*Table, error) {
 
 // Insert appends one row. The row must contain exactly the table columns.
 func (t *Table) Insert(row map[string]string) error {
-	clean := map[string]string{}
+	fullRow := Row{Values: make(map[string]Value)}
+
 	for _, column := range t.Columns {
 		value, ok := row[column.Name]
 		if !ok {
 			return fmt.Errorf("missing value for column %q", column.Name)
 		}
-		clean[column.Name] = value
+		valueForRow, err := ParseDataType(value, column.Type)
+		if err != nil {
+			return err
+		}
+
+		fullRow.Values[column.Name] = valueForRow
 	}
+	t.Rows = append(t.Rows, fullRow)
+
 	for column := range row {
 		if !containsColumn(t.Columns, column) {
 			return fmt.Errorf("unknown column %q", column)
 		}
 	}
 
-	t.Rows = append(t.Rows, clean)
 	return t.save()
 }
 
 // SelectAll returns a copy of all rows in insertion order.
-func (t *Table) SelectAll() []map[string]string {
-	rows := make([]map[string]string, 0, len(t.Rows))
-	for _, row := range t.Rows {
-		copyRow := map[string]string{}
-		for key, value := range row {
-			copyRow[key] = value
-		}
-		rows = append(rows, copyRow)
-	}
-	return rows
+func (t *Table) SelectAll() []Row {
+	return t.Rows
 }
 
 func loadTable(path string) (*Table, error) {

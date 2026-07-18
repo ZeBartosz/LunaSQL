@@ -84,25 +84,20 @@ func selectFromTableStmt(selectStmt ast.SelectFromTable, db *Database) error {
 		rows := table.SelectAll()
 
 		fmt.Printf("\nTable: %s\n", selectStmt.TableName)
-		for _, r := range rows {
-			for k, v := range r {
-				fmt.Println("Key:", k, "Value:", v)
-			}
-		}
-	} else {
-		tablePath := filepath.Join(db.path, selectStmt.TableName+".table.json")
-		table, err := loadTable(tablePath)
-		if err != nil {
-			return err
-		}
-		rows := table.SelectAll()
+		for _, row := range rows {
+			for _, column := range table.Columns {
+				var values Value
+				values.Data = row.Values[column.Name].Data
+				values.Type = row.Values[column.Name].Type
 
-		fmt.Printf("Table: %s\n", selectStmt.TableName)
-		for _, r := range rows {
-			for k, v := range r {
-				fmt.Println("Key:", k, "Value:", v)
+				formated, err := formatData(values, values.Type)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("\n%s: %s", column.Name, formated)
 			}
 		}
 	}
+
 	return nil
 }
