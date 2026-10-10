@@ -24,10 +24,22 @@ type Table struct {
 	path    string              `json:"-"`
 }
 
+var (
+	ErrEmptyDatabaseName = errors.New("database name not provides")
+	ErrEmptyTableName    = errors.New("table name not provides")
+	ErrEmptyColumns      = errors.New("must provide at least one column")
+	ErrTableExists       = errors.New("table already exists")
+	ErrDuplicateColumn   = errors.New("duplicate column")
+	ErrNotDatabase       = errors.New("not a database directory")
+	ErrCorruptTable      = errors.New("corrupt table file")
+	ErrMissingColumn     = errors.New("missing column")
+	ErrUnknownColumn     = errors.New("provided column is unknown")
+)
+
 // CreateDatabase creates a database directory and returns it.
 func (e *Engine) CreateDatabase(name string) (*Database, error) {
 	if name == "" {
-		return nil, errors.New("database name cannot be empty")
+		return nil, ErrEmptyDatabaseName
 	}
 
 	path := filepath.Join(e.Root, name)
@@ -41,13 +53,17 @@ func (e *Engine) CreateDatabase(name string) (*Database, error) {
 
 // OpenDatabase loads an existing database directory.
 func (e *Engine) OpenDatabase(name string) (*Database, error) {
+	if name == "" {
+		return nil, ErrEmptyDatabaseName
+	}
+
 	path := filepath.Join(e.Root, name)
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
 	}
 	if !info.IsDir() {
-		return nil, fmt.Errorf("%s is not a database directory", path)
+		return nil, fmt.Errorf("%w: %s", ErrNotDatabase, path)
 	}
 
 	db := &Database{Name: name, path: path, Tables: map[string]*Table{}}
@@ -68,18 +84,28 @@ func (e *Engine) OpenDatabase(name string) (*Database, error) {
 // CreateTable creates an empty table with fixed column names.
 func (db *Database) CreateTable(name string, columns []string) (*Table, error) {
 	if name == "" {
-		return nil, errors.New("table name cannot be empty")
+		return nil, ErrEmptyTableName
 	}
 	if len(columns) == 0 {
-		return nil, errors.New("table must have at least one column")
+		return nil, ErrEmptyColumns
 	}
 	if _, exists := db.Tables[name]; exists {
-		return nil, fmt.Errorf("table %q already exists", name)
+		return nil, fmt.Errorf("%w: %s", ErrTableExists, name)
+	}
+
+	seenSlice := make([]string, 0, len(columns))
+	for column := range slices.Values(columns) {
+		seen := slices.Contains(seenSlice, column)
+		if seen {
+			return nil, fmt.Errorf("%w: %s", ErrDuplicateColumn, column)
+		}
+
+		seenSlice = append(seenSlice, column)
 	}
 
 	table := &Table{
 		Name:    name,
-		Columns: columns,
+		Columns: seenSlice,
 		Rows:    []map[string]string{},
 		path:    filepath.Join(db.path, name+".table.json"),
 	}
@@ -98,13 +124,13 @@ func (t *Table) Insert(row map[string]string) error {
 	for _, column := range t.Columns {
 		value, ok := row[column]
 		if !ok {
-			return fmt.Errorf("missing value for column %q", column)
+			return fmt.Errorf("%s: %s", ErrMissingColumn, column)
 		}
 		clean[column] = value
 	}
 	for column := range row {
 		if !contains(t.Columns, column) {
-			return fmt.Errorf("unknown column %q", column)
+			return fmt.Errorf("%s: %s", ErrUnknownColumn, column)
 		}
 	}
 
@@ -132,7 +158,7 @@ func loadTable(path string) (*Table, error) {
 	}
 	var table Table
 	if err := json.Unmarshal(bytes, &table); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w %s: %w", ErrCorruptTable, path, err)
 	}
 	table.path = path
 	return &table, nil

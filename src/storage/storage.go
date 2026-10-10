@@ -1,9 +1,3 @@
-// Package storage contains a deliberately small, file-backed storage layer.
-//
-// It is scaffolding for learning: tables are JSON files, rows are stored in
-// memory while the engine runs, and every mutation rewrites the full table.
-// This is simple (not fast), which makes it easy to replace piece by piece as
-// you learn how real databases work.
 package storage
 
 import (
