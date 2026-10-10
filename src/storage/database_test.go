@@ -1,9 +1,11 @@
 package storage
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -218,6 +220,59 @@ func TestCreateTable(t *testing.T) {
 			require.Equal(t, filepath.Join(database.path, test.name+".table.json"), tables.path)
 			require.Equal(t, test.name, tables.Name)
 			require.Equal(t, test.columns, tables.Columns)
+		})
+	}
+}
+
+func TestInsertToTable(t *testing.T) {
+	tests := map[string]struct {
+		name      string
+		columns   []string
+		rows      []map[string]string
+		expectErr error
+	}{
+		"sucessfully create a row": {
+			name:    "table1",
+			columns: []string{"column1"},
+			rows:    []map[string]string{{"column1": "value1"}},
+		},
+		"sucessfully create couple rows": {
+			name:    "table1",
+			columns: []string{"column1", "column2", "column3"},
+			rows:    []map[string]string{{"column1": "value1", "column2": "value2", "column3": "value3"}},
+		},
+		"error providing columns which doesnt exists": {
+			name:      "table1",
+			columns:   []string{"column1"},
+			rows:      []map[string]string{{"column3": "value3"}},
+			expectErr: fmt.Errorf("%s: column1", ErrMissingColumn),
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			dirName := t.TempDir()
+
+			storage, err := NewEngine(dirName)
+			require.NoError(t, err)
+
+			database, err := storage.CreateDatabase("database")
+			require.NoError(t, err)
+
+			table, err := database.CreateTable(test.name, test.columns)
+			require.NoError(t, err)
+
+			for row := range slices.Values(test.rows) {
+				err = table.Insert(row)
+				if test.expectErr != nil {
+					require.ErrorAs(t, test.expectErr, &err)
+					return
+				}
+				require.Contains(t, table.Rows, row)
+			}
+
+			require.Equal(t, test.rows, table.Rows)
 		})
 	}
 }

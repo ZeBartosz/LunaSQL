@@ -32,6 +32,8 @@ var (
 	ErrDuplicateColumn   = errors.New("duplicate column")
 	ErrNotDatabase       = errors.New("not a database directory")
 	ErrCorruptTable      = errors.New("corrupt table file")
+	ErrMissingColumn     = errors.New("missing column")
+	ErrUnknownColumn     = errors.New("provided column is unknown")
 )
 
 // CreateDatabase creates a database directory and returns it.
@@ -122,13 +124,13 @@ func (t *Table) Insert(row map[string]string) error {
 	for _, column := range t.Columns {
 		value, ok := row[column]
 		if !ok {
-			return fmt.Errorf("missing value for column %q", column)
+			return fmt.Errorf("%s: %s", ErrMissingColumn, column)
 		}
 		clean[column] = value
 	}
 	for column := range row {
 		if !contains(t.Columns, column) {
-			return fmt.Errorf("unknown column %q", column)
+			return fmt.Errorf("%s: %s", ErrUnknownColumn, column)
 		}
 	}
 
